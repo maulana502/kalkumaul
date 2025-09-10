@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Sederhana - Website Kalkulator Online</title>
+    <!-- Impor Tailwind CSS untuk styling modern -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom CSS untuk efek tambahan */
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .hero {
+            text-align: center;
+            padding: 50px 20px;
+            color: white;
+        }
+        .calc-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            max-width: 400px;
+            width: 100%;
+            margin: 20px auto;
+            transition: transform 0.3s ease;
+        }
+        .calc-container:hover {
+            transform: translateY(-5px);
+        }
+        .display {
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+            text-align: right;
+            padding: 20px;
+            font-size: 2rem;
+            color: #333;
+            overflow-x: auto;
+            min-height: 80px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            padding: 20px;
+        }
+        .btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 20px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.1s ease;
+        }
+        .btn:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+        .btn.operator {
+            background: #007bff;
+        }
+        .btn.operator:hover {
+            background: #0056b3;
+        }
+        .btn.equals {
+            background: #28a745;
+        }
+        .btn.equals:hover {
+            background: #218838;
+        }
+        .btn.clear {
+            background: #dc3545;
+        }
+        .btn.clear:hover {
+            background: #c82333;
+        }
+        .btn.zero {
+            grid-column: span 2;
+        }
+        .history-panel {
+            max-height: 200px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 10px;
+            margin: 20px auto;
+            max-width: 400px;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: white;
+        }
+        /* Mode gelap */
+        .dark-mode {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        }
+        .dark-mode .calc-container,
+        .dark-mode .history-panel {
+            background: #2d3748;
+            color: white;
+        }
+        .dark-mode .display {
+            background: #4a5568;
+            color: #e2e8f0;
+        }
+        .dark-mode .btn {
+            background: #4a5568;
+        }
+        .dark-mode .btn:hover {
+            background: #2d3748;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header/Hero Section -->
+    <section class="hero">
+        <h1 class="text-4xl md:text-6xl font-bold mb-4">Website Kalkulator Online</h1>
+        <p class="text-lg md:text-xl">Hitung dengan mudah dan cepat menggunakan kalkulator sederhana ini. Klik tombol-tombol di bawah atau gunakan keyboard untuk input.</p>
+        <button id="toggleMode" class="mt-4 bg-white text-purple-700 px-4 py-2 rounded-full hover:bg-gray-200 transition">Mode Gelap</button>
+    </section>
+
+    <img src="aset/90c96761ef2e22853193fcd7409f30dc.jpg" alt="Ilustrasi kalkulator digital abstrak dengan tombol-tombtah silikon hitam di atas latar belakang biru gradien, menunjukkan ikon kalkulator yang elegan dan modern dengan layar LED dan simbol matematika" class="mx-auto block mb-4" />
+
+    <!-- Calculator Container -->
+    <div class="calc-container">
+        <div id="display" class="display">
+            <span>0</span>
+            <span>
+                <img src="aset/90c96761ef2e22853193fcd7409f30dc.jpg" alt="Ikon equal symbol kecil dengan bentuk garis horizontal" style="width: 20px; height: 20px;" />
+            </span>
+        </div>
+        <div class="button-grid">
+            <button class="btn clear" onclick="clearDisplay()">C</button>
+            <button class="btn operator" onclick="appendToDisplay('/')">/</button>
+            <button class="btn operator" onclick="appendToDisplay('*')">*</button>
+            <button class="btn operator" onclick="appendToDisplay('-')">-</button>
+            <button class="btn" onclick="appendToDisplay('7')">7</button>
+            <button class="btn" onclick="appendToDisplay('8')">8</button>
+            <button class="btn" onclick="appendToDisplay('9')">9</button>
+            <button class="btn operator" onclick="appendToDisplay('+')">+</button>
+            <button class="btn" onclick="appendToDisplay('4')">4</button>
+            <button class="btn" onclick="appendToDisplay('5')">5</button>
+            <button class="btn" onclick="appendToDisplay('6')">6</button>
+            <button class="btn equals" onclick="calculate()" style="grid-column: span 2;">=</button>
+            <button class="btn" onclick="appendToDisplay('1')">1</button>
+            <button class="btn" onclick="appendToDisplay('2')">2</button>
+            <button class="btn" onclick="appendToDisplay('3')">3</button>
+            <button class="btn zero" onclick="appendToDisplay('0')" style="grid-column: span 2;">0</button>
+            <button class="btn" onclick="appendToDisplay('.')">.</button>
+        </div>
+    </div>
+
+    <!-- History Panel -->
+    <div id="historyPanel" class="history-panel hidden">
+        <h3 class="font-bold mb-2">Riwayat Hitungan</h3>
+        <div id="historyList"></div>
+        <button class="btn clear mt-2" onclick="clearHistory()">Hapus Riwayat</button>
+    </div>
+    <button id="toggleHistory" class="block mx-auto mt-4 bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 transition">Tampilkan Riwayat</button>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; Rachmat Hidayatullah & Maulana</p>
+    </footer>
+
+    <script>
+        let currentInput = '';
+        let history = [];
+
+        // Fungsi untuk toggle mode gelap/terang
+        document.getElementById('toggleMode').addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            document.getElementById('toggleMode').textContent = document.body.classList.contains('dark-mode') ? 'Mode Terang' : 'Mode Gelap';
+        });
+
+        function clearDisplay() {
+            currentInput = '';
+            document.getElementById('display').firstElementChild.textContent = '0';
+        }
+
+function appendToDisplay(value) {
+            // Mencegah multiple decimal points atau operator berulang
+            if ((value === '.' && currentInput.includes('.')) ||
+                (['+', '-', '*', '/'].includes(value) && ['+', '-', '*', '/'].includes(currentInput.slice(-1)))) {
+                return;
+            }
+            // Gantikan display dari '0' dengan input baru
+            if (document.getElementById('display').firstElementChild.textContent === '0' && !['+', '-', '*', '/'].includes(value)) {
+                currentInput = value;
+            } else {
+                currentInput += value;
+            }
+            document.getElementById('display').firstElementChild.textContent = currentInput;
+        }
+
+        function calculate() {
+            try {
+                // Eval untuk kalkulasi sederhana
+                if (currentInput && !isNaN(eval(currentInput))) {
+                    let result = eval(currentInput);
+                    if (!isFinite(result)) {
+                        document.getElementById('display').firstElementChild.textContent = 'Error';
+                        currentInput = '';
+                    } else {
+                        history.push(`${currentInput} = ${result}`);
+                        document.getElementById('display').firstElementChild.textContent = result;
+                        currentInput = result.toString();
+                        updateHistory();
+                    }
+                } else {
+                    document.getElementById('display').firstElementChild.textContent = '0';
+                }
+            } catch (e) {
+                document.getElementById('display').firstElementChild.textContent = 'Error';
+                currentInput = '';
+            }
+        }
+
+        function updateHistory() {
+            const list = document.getElementById('historyList');
+            list.innerHTML = history.map(item => `<p>${item}</p>`).join('');
+        }
+
+        function clearHistory() {
+            history = [];
+            updateHistory();
+        }
+
+        // Toggle riwayat
+        document.getElementById('toggleHistory').addEventListener('click', () => {
+            const panel = document.getElementById('historyPanel');
+            panel.classList.toggle('hidden');
+        });
+
+        // Support keyboard
+        document.addEventListener('keydown', function(event) {
+            if (event.key >= '0' && event.key <= '9') {
+                appendToDisplay(event.key);
+            } else if (['+', '-', '*', '/'].includes(event.key)) {
+                appendToDisplay(event.key);
+            } else if (event.key === '.' || event.key === ',') {
+                appendToDisplay('.');
+            } else if (event.key === 'Enter') {
+                calculate();
+            } else if (event.key === 'Escape' || event.key.toLowerCase() === 'c') {
+                clearDisplay();
+            } else if (event.key === 'Backspace') {
+                currentInput = currentInput.slice(0, -1);
+                document.getElementById('display').firstElementChild.textContent = currentInput || '0';
+            }
+        });
+    </script>
+</body>
+</html>
+</content>
+</create_file>

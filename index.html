@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Arial', sans-serif;
+        }
+        .calculator {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .btn {
+            transition: all 0.3s ease;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        .display {
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 2rem;
+            text-align: right;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+    <div class="calculator w-full max-w-xs bg-white p-6 rounded-2xl shadow-lg">
+        <div class="display mb-4 p-4 h-20 bg-gray-200 rounded-lg">
+            <input id="display" type="text" class="w-full bg-transparent outline-none text-right text-gray-800" readonly>
+        </div>
+        <div class="grid grid-cols-4 gap-4">
+            <button class="btn bg-red-500 text-white p-4" onclick="clearDisplay()">C</button>
+            <button class="btn bg-gray-500 text-white p-4" onclick="appendOperator('/')">/</button>
+            <button class="btn bg-gray-500 text-white p-4" onclick="appendOperator('*')">*</button>
+            <button class="btn bg-gray-500 text-white p-4" onclick="appendOperator('-')">-</button>
+
+            <button class="btn bg-blue-500 text-white p-4" onclick="appendNumber(7)">7</button>
+            <button class="btn bg-blue-500 text-white p-4" onclick="appendNumber(8)">8</button>
+            <button class="btn bg-blue-500 text-white p-4" onclick="appendNumber(9)">9</button>
+            <button class="btn bg-blue-500 text-white p-4 h-14 row-span-2" onclick="appendOperator('+')">+</button>
+
+            <button class="btn bg-blue-500 text-white p-4" onclick="appendNumber(4)">4</button>
+            <button class="btn bg-blue-500 text-white p-4" onclick="appendNumber(5)">5</button>
+            <button class="btn bg-blue-500 text-white p-4" onclick="appendNumber(6)">6</button>
+
+            <button class="btn bg-blue-500 text-white p-4" onclick="appendNumber(1)">1</button>
+            <button class="btn bg-blue-500 text-white p-4" onclick="appendNumber(2)">2</button>
+            <button class="btn bg-blue-500 text-white p-4" onclick="appendNumber(3)">3</button>
+            <button class="btn bg-green-500 text-white p-4 h-14 row-span-2" onclick="calculate()">=</button>
+
+            <button class="btn bg-blue-500 text-white p-4 col-span-2" onclick="appendNumber(0)">0</button>
+            <button class="btn bg-blue-500 text-white p-4" onclick="appendDot()">.</button>
+        </div>
+    </div>
+
+    <script>
+        let display = document.getElementById('display');
+        let currentInput = '';
+        let operator = '';
+        let firstOperand = '';
+        let waitingForSecondOperand = false;
+
+        function appendNumber(number) {
+            if (waitingForSecondOperand) {
+                display.value = number;
+                waitingForSecondOperand = false;
+            } else {
+                if (display.value === '0') {
+                    display.value = number;
+                } else {
+                    display.value += number;
+                }
+            }
+            currentInput = display.value;
+        }
+
+        function appendOperator(op) {
+            if (waitingForSecondOperand) {
+                operator = op;
+                return;
+            }
+            if (firstOperand === '') {
+                firstOperand = currentInput;
+            } else if (operator) {
+                firstOperand = operate(firstOperand, operator, currentInput);
+                display.value = firstOperand;
+            }
+            operator = op;
+            waitingForSecondOperand = true;
+            currentInput = display.value;
+        }
+
+        function appendDot() {
+            if (waitingForSecondOperand) {
+                display.value = '0.';
+                waitingForSecondOperand = false;
+                return;
+            }
+            if (display.value.includes('.')) return;
+            display.value += '.';
+        }
+
+        function calculate() {
+            if (operator && waitingForSecondOperand) {
+                display.value = operate(firstOperand, operator, currentInput);
+                firstOperand = display.value;
+                operator = '';
+                waitingForSecondOperand = false;
+            }
+        }
+
+        function clearDisplay() {
+            display.value = '0';
+            currentInput = '';
+            operator = '';
+            firstOperand = '';
+            waitingForSecondOperand = false;
+        }
+
+        function operate(a, op, b) {
+            a = parseFloat(a);
+            b = parseFloat(b);
+            switch (op) {
+                case '+': return a + b;
+                case '-': return a - b;
+                case '*': return a * b;
+                case '/': return a / b;
+                default: return b;
+            }
+        }
+
+        // Initialize display
+        display.value = '0';
+    </script>
+</body>
+</html>
+</content>
+</create_file>
